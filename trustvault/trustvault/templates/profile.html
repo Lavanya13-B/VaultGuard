@@ -1,0 +1,5 @@
+{% extends "base.html" %}{% block title %}My Profile · VaultGuard{% endblock %}{% block body %}
+<div class="page-heading"><div><p class="eyebrow">ACCOUNT</p><h1>My Profile</h1><p class="mute">Your account details and VaultGuard role.</p></div><a class="btn secondary" href="{{ url_for('dashboard') }}">← Back to dashboard</a></div>
+<section class="profile-card card"><div class="avatar" aria-hidden="true">{{ profile.display_name[:1]|upper }}</div><div class="profile-main"><h2>{{ profile.display_name }}</h2><p class="mute">@{{ profile.username }}</p><span class="tag role-tag">{{ profile.role|title }}</span></div></section>
+<section class="card"><h2>Account information</h2><dl class="profile-details"><div><dt>Full name</dt><dd>{{ profile.display_name }}</dd></div><div><dt>Username</dt><dd>{{ profile.username }}</dd></div><div><dt>Role</dt><dd>{{ profile.role|title }}</dd></div><div><dt>Account status</dt><dd>{{ 'Active' if profile.active else 'Inactive' }}</dd></div><div><dt>Account created</dt><dd>{{ profile.created_at }}</dd></div></dl><a class="btn" href="{{ url_for('password') }}">Change password</a></section>
+{% endblock %}

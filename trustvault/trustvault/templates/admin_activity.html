@@ -1,0 +1,11 @@
+{% extends "base.html" %}{% block body %}<h1>Document activity &amp; permission changes</h1>
+<form class="card row" method="get">
+<label>View<select name="group"><option value="">Everything</option><option value="permissions" {{ 'selected' if f.get('group')=='permissions' }}>Permission changes</option><option value="documents" {{ 'selected' if f.get('group')=='documents' }}>Document activity</option></select></label>
+<label>Result<select name="outcome"><option value="">Any</option>{% for o in ['success','denied','error'] %}<option {{ 'selected' if f.get('outcome')==o }}>{{ o }}</option>{% endfor %}</select></label>
+<label>Person<input name="actor" value="{{ f.get('actor','') }}"></label><label>Document id<input name="doc" value="{{ f.get('doc','') }}"></label>
+<label>From<input type="date" name="from" value="{{ f.get('from','') }}"></label><label>To<input type="date" name="to" value="{{ f.get('to','') }}"></label><button>Filter</button></form>
+<div class="card" style="overflow-x:auto"><table><tr><th>#</th><th>When (UTC)</th><th>Who</th><th>Action</th><th>Result</th><th>Document</th><th>Detail</th><th>IP</th></tr>
+{% for r in rows %}<tr><td>{{ r.id }}</td><td class="mute">{{ r.ts }}</td><td>{{ r.actor_name or '?' }}{% if r.target_user %} &rarr; {{ r.target_user }}{% endif %}</td><td>{{ r.action }}</td>
+<td class="{{ 'denied' if r.outcome!='success' }}">{{ r.outcome }}</td><td>{% if r.doc_id %}{{ r.doc_name or '(deleted/unknown)' }}<br><span class="mono">{{ r.doc_id[:12] }}</span>{% endif %}</td><td class="mono">{{ r.detail or '' }}</td><td class="mute">{{ r.ip }}</td></tr>{% endfor %}</table>
+<p>{% if page>1 %}<a href="{{ url_for('admin_activity', page=page-1, **base) }}">&larr; Newer</a> {% endif %}
+{% if rows|length==100 %}<a href="{{ url_for('admin_activity', page=page+1, **base) }}">Older &rarr;</a>{% endif %}</p></div>{% endblock %}

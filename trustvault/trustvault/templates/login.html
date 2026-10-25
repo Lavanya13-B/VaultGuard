@@ -1,0 +1,32 @@
+{% extends "base.html" %}{% block body %}
+<div class="card" style="max-width:460px;margin:3rem auto">
+<h1>Sign in to VaultGuard</h1>
+<form method="post" class="row" style="flex-direction:column;align-items:stretch">
+<input type="hidden" name="form_token" value="{{ form_token }}">
+<label>Username<input name="username" autocomplete="username" required autofocus></label>
+<label>Password<input name="password" type="password" autocomplete="current-password" required></label>
+<button type="submit">Sign in</button>
+</form>
+{% if demo_mode %}
+<section class="demo-box" aria-labelledby="demo-heading">
+<h2 id="demo-heading">Quick demo access</h2>
+<p class="mute small">For project evaluation only. Choose a role to sign in with the pre-created demo account.</p>
+<div class="demo-actions">
+<form method="post" action="{{ url_for('login') }}">
+<input type="hidden" name="form_token" value="{{ form_token }}"><input type="hidden" name="username" value="admin"><input type="hidden" name="password" value="Demo-Passw0rd!x">
+<button type="submit">Continue as Admin</button>
+</form>
+<form method="post" action="{{ url_for('login') }}">
+<input type="hidden" name="form_token" value="{{ form_token }}"><input type="hidden" name="username" value="alice"><input type="hidden" name="password" value="Demo-Passw0rd!x">
+<button type="submit" class="secondary-demo">Continue as Owner</button>
+</form>
+<form method="post" action="{{ url_for('login') }}">
+<input type="hidden" name="form_token" value="{{ form_token }}"><input type="hidden" name="username" value="carol"><input type="hidden" name="password" value="Demo-Passw0rd!x">
+<button type="submit" class="secondary-demo">Continue as Viewer</button>
+</form>
+</div>
+<p class="mute small">Demo password: <code>Demo-Passw0rd!x</code></p>
+</section>
+{% endif %}
+<p class="mute">Accounts are created by an administrator. Every sign-in attempt is recorded.</p>
+</div>{% endblock %}

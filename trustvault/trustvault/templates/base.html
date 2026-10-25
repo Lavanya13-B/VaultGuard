@@ -1,0 +1,16 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{% block title %}VaultGuard{% endblock %}</title><link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"></head><body>
+<header><a class="logo" href="{{ url_for('dashboard') }}">&#128274; VaultGuard</a>
+{% if me %}
+<nav class="navlinks" aria-label="Main navigation">
+<a href="{{ url_for('dashboard') }}">Dashboard</a>
+<a href="{{ url_for('documents') }}">Documents</a>
+{% if me.role == 'owner' %}<a href="{{ url_for('upload') }}">Upload</a>{% endif %}
+{% if me.role == 'admin' %}<a href="{{ url_for('admin_users') }}">Users</a><a href="{{ url_for('admin_activity') }}">Activity</a><a href="{{ url_for('admin_verify') }}">Verify audit</a>{% endif %}
+<a href="{{ url_for('profile') }}">My Profile</a>
+</nav>
+<div class="account-chip"><span>{{ me.display_name }}</span><span class="tag">{{ me.role|title }}</span></div>
+<form class="inline" method="post" action="{{ url_for('logout') }}"><input type="hidden" name="csrf" value="{{ csrf }}"><button class="link">Sign out</button></form>
+{% endif %}</header><main>
+{% for cat, m in get_flashed_messages(with_categories=true) %}<div class="msg {{ cat }}">{{ m }}</div>{% endfor %}
+{% block body %}{% endblock %}</main></body></html>

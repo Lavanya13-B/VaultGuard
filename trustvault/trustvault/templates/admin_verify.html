@@ -1,0 +1,6 @@
+{% extends "base.html" %}{% block body %}<h1>Audit log integrity</h1>
+<div class="card">{% if result.ok %}<p style="color:var(--ok);font-weight:600">&#10003; Chain intact: {{ result.count }} entries verified.</p>
+{% else %}<p class="denied">&#10007; TAMPERING DETECTED{% if result.bad_id %} at entry #{{ result.bad_id }}{% endif %}: {{ result.why }}</p>{% endif %}
+<p>Current head: <b>{{ head.count }}</b> entries, hash <span class="mono">{{ head.hash }}</span></p>
+<p class="mute">Record this pair somewhere the application cannot write to. Later, enter it below: truncation of recent entries is then detectable too.</p>
+<form class="row" method="get"><label>Entries<input name="count" value="{{ request.args.get('count','') }}"></label><label>Head hash<input name="hash" size="50" value="{{ request.args.get('hash','') }}"></label><button>Verify against anchor</button></form></div>{% endblock %}

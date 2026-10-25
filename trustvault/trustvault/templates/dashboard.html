@@ -1,0 +1,21 @@
+{% extends "base.html" %}{% block title %}Dashboard · VaultGuard{% endblock %}{% block body %}
+<section class="welcome">
+  <div><p class="eyebrow">SECURE DOCUMENT WORKSPACE</p><h1>Welcome, {{ me.display_name }}</h1>
+  <p class="mute">You are signed in as <span class="tag">{{ me.role|title }}</span>. Your available actions depend on your role and document permissions.</p></div>
+  {% if me.role == 'owner' %}<a class="btn" href="{{ url_for('upload') }}">＋ Upload document</a>{% endif %}
+</section>
+<div class="stats">
+  <article class="stat-card"><span class="stat-label">Documents you own</span><strong>{{ own_count }}</strong><a href="{{ url_for('documents', scope='mine') }}">View your documents →</a></article>
+  <article class="stat-card"><span class="stat-label">Shared with you</span><strong>{{ shared_count }}</strong><a href="{{ url_for('documents', scope='shared') }}">View shared documents →</a></article>
+  {% if me.role == 'admin' %}<article class="stat-card"><span class="stat-label">Active accounts</span><strong>{{ user_count }}</strong><a href="{{ url_for('admin_users') }}">Manage users →</a></article>
+  {% else %}<article class="stat-card"><span class="stat-label">Your role</span><strong class="role-stat">{{ me.role|title }}</strong><a href="{{ url_for('profile') }}">View profile →</a></article>{% endif %}
+</div>
+<section class="card"><div class="section-heading"><h2>Quick actions</h2></div><div class="quick-actions">
+<a class="quick-action" href="{{ url_for('documents') }}"><strong>Browse documents</strong><span>Find documents you own or have been granted access to.</span></a>
+{% if me.role == 'owner' %}<a class="quick-action" href="{{ url_for('upload') }}"><strong>Upload a document</strong><span>Store a new document securely and manage its access.</span></a>{% endif %}
+{% if me.role == 'admin' %}<a class="quick-action" href="{{ url_for('admin_users') }}"><strong>Manage users</strong><span>Create accounts and manage account status.</span></a><a class="quick-action" href="{{ url_for('admin_activity') }}"><strong>Audit activity</strong><span>Review recorded activity and verify audit integrity.</span></a>{% endif %}
+<a class="quick-action" href="{{ url_for('profile') }}"><strong>My profile</strong><span>Check your account details and assigned role.</span></a>
+</div></section>
+<section class="card"><div class="section-heading"><h2>Your recent activity</h2>{% if me.role == 'admin' %}<a href="{{ url_for('admin_activity') }}">View full audit log →</a>{% endif %}</div>
+{% if recent %}<div class="activity-list">{% for event in recent %}<div class="activity-row"><div><strong>{{ event.action|replace('_',' ')|title }}</strong>{% if event.target_user %}<span class="mute"> · {{ event.target_user }}</span>{% endif %}<div class="mute small">{{ event.ts }}{% if event.doc_id %} · document {{ event.doc_id[:8] }}{% endif %}</div></div><span class="tag">{{ event.outcome|title }}</span></div>{% endfor %}</div>{% else %}<p class="mute">Your activity will appear here as you use VaultGuard.</p>{% endif %}
+</section>{% endblock %}

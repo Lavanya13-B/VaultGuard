@@ -1,0 +1,33 @@
+{% extends "base.html" %}{% block body %}
+<h1>{{ doc.name }} <span class="tag">{{ doc.category }}</span></h1>
+<div class="card"><p class="mute">Owner: {{ owner }} &middot; Your access: <b>{{ level }}</b> &middot; Created {{ doc.created_at }} &middot; Updated {{ doc.updated_at }}</p>
+<table><tr><th>Version</th><th>File</th><th>Size</th><th>By</th><th>When</th><th>SHA-256</th><th></th></tr>
+{% for v in versions %}<tr><td>v{{ v.version }}</td><td>{{ v.original_filename }}</td><td>{{ v.size }} B</td><td>{{ v.by_user }}</td><td>{{ v.uploaded_at }}</td><td class="mono">{{ v.sha256[:16] }}&hellip;</td>
+<td><a class="btn" href="{{ url_for('download', doc_id=doc.id, version=v.version) }}">Download</a></td></tr>{% endfor %}</table>
+<p class="mute">Every download is recorded before the file is released.</p></div>
+
+{% if level in ('edit','owner') %}<div class="card"><h2>Edit</h2>
+<form method="post" action="{{ url_for('metadata', doc_id=doc.id) }}" class="row"><input type="hidden" name="csrf" value="{{ csrf }}">
+<label>Name<input name="name" value="{{ doc.name }}" required></label>
+<label>Category<select name="category">{% for c in categories %}<option {{ 'selected' if c==doc.category }}>{{ c }}</option>{% endfor %}</select></label><button>Save details</button></form><br>
+<form method="post" action="{{ url_for('replace', doc_id=doc.id) }}" enctype="multipart/form-data" class="row"><input type="hidden" name="csrf" value="{{ csrf }}">
+<label>Upload a new version<input type="file" name="file" required></label><button>Save as new version</button></form></div>{% endif %}
+
+{% if level == 'owner' %}
+<div class="card"><h2>Who has access</h2>
+{% if grants %}<table><tr><th>Person</th><th>Level</th><th>Expires</th><th></th></tr>{% for g in grants %}<tr><td>{{ g.username }}</td><td><span class="tag">{{ g.level }}</span></td><td class="mute">{{ g.expires_at or 'never' }}</td>
+<td><form class="inline" method="post" action="{{ url_for('revoke', doc_id=doc.id) }}"><input type="hidden" name="csrf" value="{{ csrf }}"><input type="hidden" name="grant_id" value="{{ g.id }}"><button class="danger">Revoke now</button></form></td></tr>{% endfor %}</table>
+{% else %}<p class="mute">Nobody but you.</p>{% endif %}<br>
+<form method="post" action="{{ url_for('share', doc_id=doc.id) }}" class="row"><input type="hidden" name="csrf" value="{{ csrf }}">
+<label>Username<input name="username" required></label>
+<label>Level<select name="level"><option value="read">read</option><option value="edit">edit (can also read)</option></select></label>
+<label>Expires in (days, optional)<input name="days" size="4" inputmode="numeric"></label><button>Grant / update</button></form></div>
+
+<div class="card"><h2>Access history for this document</h2>
+<table><tr><th>When</th><th>Who</th><th>What</th><th>Result</th><th>Detail</th></tr>{% for h in history %}
+<tr><td class="mute">{{ h.ts }}</td><td>{{ h.actor_name or '?' }}{% if h.target_user %} &rarr; {{ h.target_user }}{% endif %}</td><td>{{ h.action }}</td><td class="{{ 'denied' if h.outcome!='success' }}">{{ h.outcome }}</td><td class="mono">{{ h.detail or '' }}</td></tr>{% endfor %}</table></div>
+
+<div class="card"><h2>Delete</h2><p class="mute">Permanently destroys the contents (encryption keys are erased). The audit record stays.</p>
+<form method="post" action="{{ url_for('delete', doc_id=doc.id) }}" class="row"><input type="hidden" name="csrf" value="{{ csrf }}">
+<label style="flex-direction:row;align-items:center;gap:.4rem"><input type="checkbox" name="confirm" value="yes"> I understand this cannot be undone</label><button class="danger">Delete</button></form></div>
+{% endif %}{% endblock %}

@@ -1,0 +1,13 @@
+{% extends "base.html" %}{% block body %}
+<h1>Documents</h1>
+<form class="card row" method="get">
+<label>Name<input name="q" value="{{ f.get('q','') }}"></label>
+<label>Owner<input name="owner" value="{{ f.get('owner','') }}"></label>
+<label>Category<select name="category"><option value="">Any</option>{% for c in categories %}<option {{ 'selected' if f.get('category')==c }}>{{ c }}</option>{% endfor %}</select></label>
+<label>From<input type="date" name="from" value="{{ f.get('from','') }}"></label>
+<label>To<input type="date" name="to" value="{{ f.get('to','') }}"></label>
+<label>Show<select name="scope">{% for v,t in [('all','All I can access'),('mine','Mine'),('shared','Shared with me')] %}<option value="{{ v }}" {{ 'selected' if scope==v }}>{{ t }}</option>{% endfor %}</select></label>
+<button>Search</button></form>
+<div class="card">{% if docs %}<table><tr><th>Name</th><th>Category</th><th>Owner</th><th>My access</th><th>Updated</th></tr>
+{% for d in docs %}<tr><td><a href="{{ url_for('document', doc_id=d.id) }}">{{ d.name }}</a></td><td>{{ d.category }}</td><td>{{ d.owner }}</td><td><span class="tag">{{ d.my_level }}</span></td><td class="mute">{{ d.updated_at }}</td></tr>{% endfor %}</table>
+{% else %}<p class="mute">No documents match. You only ever see documents you own or were granted.</p>{% endif %}</div>{% endblock %}

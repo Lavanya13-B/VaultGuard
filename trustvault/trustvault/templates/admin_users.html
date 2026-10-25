@@ -1,0 +1,9 @@
+{% extends "base.html" %}{% block body %}<h1>Users</h1>
+<div class="card"><table><tr><th>Username</th><th>Name</th><th>Role</th><th>Status</th><th></th></tr>
+{% for u in users %}<tr><td>{{ u.username }}</td><td>{{ u.display_name }}</td><td><span class="tag">{{ u.role }}</span></td><td>{{ 'active' if u.active else 'deactivated' }}{% if u.locked_until %} <span class="mute">(locked)</span>{% endif %}</td>
+<td>{% if u.id != me.id %}<form class="inline" method="post" action="{{ url_for('admin_user_state', uid=u.id, state='deactivate' if u.active else 'activate') }}"><input type="hidden" name="csrf" value="{{ csrf }}"><button class="{{ 'danger' if u.active else '' }}">{{ 'Deactivate' if u.active else 'Reactivate' }}</button></form>{% endif %}</td></tr>{% endfor %}</table>
+<p class="mute">Deactivating signs the person out immediately and ends every grant's effect: inactive users can't pass the access check.</p></div>
+<div class="card"><h2>Create user</h2><form method="post" class="row"><input type="hidden" name="csrf" value="{{ csrf }}">
+<label>Username<input name="username" required></label><label>Full name<input name="display_name" required></label>
+<label>Role<select name="role"><option>viewer</option><option>owner</option><option>admin</option></select></label>
+<label>Initial password (12+)<input type="password" name="password" required minlength="12"></label><button>Create</button></form></div>{% endblock %}
